@@ -16,6 +16,8 @@ VARP(serverdebug, 0, 0, 1);
 // 2011feb05:ft: quitproc
 #include "signal.h"
 
+#include "libh6n/libh6n.h"
+
 // config
 vector<servermap *> servermaps;             // all available maps kept in memory
 
@@ -27,6 +29,13 @@ servernickblacklist nickblacklist;
 serverforbiddenlist forbiddenlist;
 serverpasswords passwords;
 serverinfofile infofiles;
+
+/* -- Begin H6N patch -- */
+
+// 
+H6ACServer* h6acserver = NULL;
+
+/*  -- End H6N patch -- */
 
 // server state
 bool isdedicated = false;
@@ -2482,6 +2491,13 @@ void disconnect_client(int n, int reason)
     sendf(-1, 1, "rii", SV_CDIS, n);
     if(curvote) curvote->evaluate();
     if(*scoresaved && mastermode == MM_MATCH) senddisconnectedscores(-1);
+
+	/* -- Begin H6N patch -- */
+
+	// Inform H6AC that the player has left the server
+	h6acserver->unregisterPlayer(c.calculateH6ACPlayerID());
+
+	/* -- End H6N patch -- */
 }
 
 // for AUTH: WIP
@@ -4098,6 +4114,14 @@ void serverslice(uint timeout)   // main server update, called from cube main lo
 
 void cleanupserver()
 {
+	/* -- Begin H6N patch -- */
+
+	// Inform H6AC that the server is going away
+	if (h6acserver)
+		h6acserver->end();
+
+	/* -- End H6N patch -- */
+
     if(serverhost) { enet_host_destroy(serverhost); serverhost = NULL; }
     if(svcctrl)
     {
@@ -4356,6 +4380,26 @@ void initserver(bool dedicated, int argc, char **argv)
     }
 
     resetserverifempty();
+
+	/* -- Begin H6N patch -- */
+
+	// Create the H6AC server interface
+	if (!h6acserver)
+		h6acserver = Agent_createServer();
+
+	if(H6N_IS_ERROR(h6acserver)) {
+		fatal("H6AC server component could not be initialized");
+	}
+
+	// Testing integration ID of all zeroes
+	H6N_IntegrationID igrID;
+	igrID.of64.hi = 0;
+	igrID.of64.lo = 0;
+
+	// Inform H6AC that the server is booting up
+	h6acserver->begin(igrID);
+
+	/* -- End H6N patch -- */
 
     if(isdedicated)       // do not return, this becomes main loop
     {

@@ -50,7 +50,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -215,7 +215,7 @@
       <Culture>0x0809</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>enet.lib;vorbisfile.lib;openal32.lib;zdll.lib;opengl32.lib;SDL.lib;SDL_image.lib;ws2_32.lib;winmm.lib;Dbghelp.lib;jpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>enet.lib;vorbisfile.lib;openal32.lib;zdll.lib;opengl32.lib;SDL.lib;SDL_image.lib;ws2_32.lib;winmm.lib;Dbghelp.lib;jpeg.lib;E:\H6NSDK-master\build32\Debug\libh6n-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -501,6 +501,7 @@
     <None Include="..\..\config\sounds.cfg" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\H6NSDK-master\src\interfaces.cpp" />
     <ClCompile Include="..\src\rendercubes.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Standalone Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Standalone|Win32'">true</ExcludedFromBuild>

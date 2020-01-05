@@ -38,3 +38,8 @@ dumpmapconfig.txt
 packetlog.txt
 profile/*
 
+/bin_win32
+/source/include/libh6n
+/source/vcpp/.vs/assaultcube/v16
+/source/vcpp/Debug
+/source/vcpp/assaultcube.vcxproj.user

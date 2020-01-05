@@ -1,5 +1,10 @@
 // server.h
 
+/* -- Begin H6N patch -- */
+#include <libh6n/common.h>
+/* -- End H6N patch -- */
+
+
 #define gamemode smode   // allows the gamemode macros to work with the server mode
 
 #define SERVER_PROTOCOL_VERSION    (PROTOCOL_VERSION)    // server without any gameplay modification
@@ -278,6 +283,17 @@ struct client                   // server side version of "dynent" type
     float pr;
     int yls, pls, tls;
     int bs, bt, blg, bp;
+
+	/* -- Begin H6N patch -- */
+
+	H6N_PlayerID calculateH6ACPlayerID() {
+		H6N_PlayerID pid;
+		memcpy(&pid, name, sizeof(pid));
+
+		return pid;
+	}
+
+	/* -- End H6N patch -- */
 
     gameevent &addevent()
     {

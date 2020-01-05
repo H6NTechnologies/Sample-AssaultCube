@@ -2,6 +2,12 @@
 
 #include "cube.h"
 
+/* -- Begin H6N patch -- */
+
+#include "libh6n/libh6n.h"
+
+/* -- End H6N patch -- */
+
 void cleanup(char *msg)         // single program exit point;
 {
     if(clientlogfile) clientlogfile->fflush();
@@ -1009,6 +1015,14 @@ int main(int argc, char **argv)
     #endif
     #endif
     #endif
+
+	/* -- Begin H6N patch -- */
+
+	// Initialize H6NSDK early in the process life.
+	// This could be done later, but we put it here for simplicity.
+	H6N_initialize();
+
+	/* -- End H6N patch -- */
 
     bool dedicated = false;
     bool quitdirectly = false;
