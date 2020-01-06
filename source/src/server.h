@@ -285,10 +285,12 @@ struct client                   // server side version of "dynent" type
     int bs, bt, blg, bp;
 
 	/* -- Begin H6N patch -- */
+    int sharedsecret;
 
 	H6N_PlayerID calculateH6ACPlayerID() {
 		H6N_PlayerID pid;
-		memcpy(&pid, name, sizeof(pid));
+        pid.of64.hi = 0;
+        pid.of64.lo = hthash(name);
 
 		return pid;
 	}

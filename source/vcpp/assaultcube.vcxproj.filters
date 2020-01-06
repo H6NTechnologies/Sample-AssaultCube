@@ -29,6 +29,9 @@
     <Filter Include="sound">
       <UniqueIdentifier>{f1b104ac-e944-435e-8b70-99868aa7c7e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="H6NSDK">
+      <UniqueIdentifier>{92608fe5-a961-4e91-b23c-b8c7a9b21768}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\command.h">
@@ -389,8 +392,8 @@
     <ClCompile Include="..\src\soundscheduler.cpp">
       <Filter>sound</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\H6NSDK-master\src\interfaces.cpp">
-      <Filter>support</Filter>
+    <ClCompile Include="..\H6NSDK\src\interfaces.cpp">
+      <Filter>H6NSDK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

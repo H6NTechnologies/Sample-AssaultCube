@@ -2461,7 +2461,7 @@ void senddisconnectedscores(int cn)
 
 const char *disc_reason(int reason)
 {
-    static const char *disc_reasons[] = { "normal", "error - end of packet", "error - client num", "vote-kicked from the server", "vote-banned from the server", "error - tag type", "connection refused - you have been banned from this server", "incorrect password", "unsuccessful administrator login", "the server is FULL - try again later", "servers mastermode is \"private\" - wait until the servers mastermode is \"open\"", "auto-kick - your score dropped below the servers threshold", "auto-ban - your score dropped below the servers threshold", "duplicate connection", "inappropriate nickname", "error - packet flood", "auto-kick - excess spam detected", "auto-kick - inactivity detected", "auto-kick - team killing detected", "auto-kick - abnormal client behavior detected" };
+    static const char *disc_reasons[] = { "normal", "error - end of packet", "error - client num", "vote-kicked from the server", "vote-banned from the server", "error - tag type", "connection refused - you have been banned from this server", "incorrect password", "unsuccessful administrator login", "the server is FULL - try again later", "servers mastermode is \"private\" - wait until the servers mastermode is \"open\"", "auto-kick - your score dropped below the servers threshold", "auto-ban - your score dropped below the servers threshold", "duplicate connection", "inappropriate nickname", "error - packet flood", "auto-kick - excess spam detected", "auto-kick - inactivity detected", "auto-kick - team killing detected", "auto-kick - abnormal client behavior detected", "Kicked by H6AC - violation detected" };
     return reason >= 0 && (size_t)reason < sizeof(disc_reasons)/sizeof(disc_reasons[0]) ? disc_reasons[reason] : "unknown";
 }
 
@@ -2687,6 +2687,10 @@ void welcomepacket(packetbuf &p, int n)
         putint(p, SV_FORCEDEATH);
         putint(p, n);
         sendf(-1, 1, "ri2x", SV_FORCEDEATH, n, n);
+        /* -- Begin H6N patch -- */
+        putint(p, SV_SHAREDSECRET);
+        putint(p, c->sharedsecret);
+        /* -- End H6N patch -- */
     }
     if(!c || clients.length()>1)
     {
@@ -2721,6 +2725,7 @@ void welcomepacket(packetbuf &p, int n)
         putint(p, SV_TEXT);
         sendstring(motd, p);
     }
+
 }
 
 void sendwelcome(client *cl, int chan)
@@ -2868,6 +2873,22 @@ void process(ENetPacket *packet, int sender, int chan)
                     disconnect_client(i, DISC_DUP);
             }
         }
+
+
+        /* -- Begin H6N patch -- */
+        
+        // Generate a shaared secret
+        // This should be a value used only once and is known to both the client and the server, like an
+        // encryption key, nonce, Steam ticket, or other authentication token. It's cryptographically hashed
+        // internally. 
+
+        // This value should normally be cryptographically secure, but an insecure random is good enough for our demo
+        cl->sharedsecret = randomMT();
+
+        // Inform H6AC of the new player
+        h6acserver->registerPlayer(cl->calculateH6ACPlayerID(), (uint8_t*)&cl->sharedsecret, sizeof(cl->sharedsecret));
+
+        /* -- End H6N patch -- */
 
         sendwelcome(cl);
         if(restorescore(*cl)) { sendresume(*cl, true); senddisconnectedscores(-1); }
@@ -4300,8 +4321,39 @@ void quitproc(int param)
     exit(param == 2 ? EXIT_SUCCESS : EXIT_FAILURE); // 3 is the only reply on Win32 apparently, SIGINT == 2 == Ctrl-C
 }
 
+/* -- Begin H6N patch -- */
+
+// H6AC needs to arbitrarily kick players by their player ID
+int kickCallbackH6AC(H6N_PlayerID playerID, const char* reason) {
+    // Iterate connected clients
+    for (int i = 0; i < clients.length(); i++) {
+        client* c = clients[i];
+        H6N_PlayerID pid = c->calculateH6ACPlayerID();
+
+        // If the current client's player ID matches the one to kick...
+        if (memcmp(pid.bytes, playerID.bytes, sizeof(H6N_PlayerID)) == 0) {
+            
+            // Kick the player
+            // Ideally, we could specify a reason in the form of a string,
+            // but this game does not support that.
+            disconnect_client(c->clientnum, DISC_H6AC);
+            return 1;
+
+        }
+    }
+
+    // If we get here, no client was found with the specified ID
+    return 0;
+}
+
+/* -- End H6N patch -- */
+
 void initserver(bool dedicated, int argc, char **argv)
 {
+    /* -- Begin H6N patch -- */
+    H6N_initialize();
+    /* -- End H6N patch -- */
+
     const char *service = NULL;
 
     for(int i = 1; i<argc; i++)
@@ -4398,6 +4450,9 @@ void initserver(bool dedicated, int argc, char **argv)
 
 	// Inform H6AC that the server is booting up
 	h6acserver->begin(igrID);
+
+    // Pass in our kick function that kicks a specified player from the server
+    h6acserver->setKickCallback(kickCallbackH6AC);
 
 	/* -- End H6N patch -- */
 
