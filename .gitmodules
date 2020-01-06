@@ -1,0 +1,3 @@
+[submodule "source/H6NSDK"]
+	path = source/H6NSDK
+	url = https://github.com/H6NTechnologies/H6NSDK.git
