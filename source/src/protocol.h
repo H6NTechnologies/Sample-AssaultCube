@@ -45,9 +45,6 @@ enum
     SV_CLIENT,
     SV_EXTENSION,
     SV_MAPIDENT, SV_HUDEXTRAS, SV_POINTS,
-    /* -- Begin H6N patch -- */
-    SV_SHAREDSECRET,
-    /* -- End H6N patch -- */
     SV_NUM
 };
 

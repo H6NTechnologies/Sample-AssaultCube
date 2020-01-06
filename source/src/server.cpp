@@ -2687,10 +2687,6 @@ void welcomepacket(packetbuf &p, int n)
         putint(p, SV_FORCEDEATH);
         putint(p, n);
         sendf(-1, 1, "ri2x", SV_FORCEDEATH, n, n);
-        /* -- Begin H6N patch -- */
-        putint(p, SV_SHAREDSECRET);
-        putint(p, c->sharedsecret);
-        /* -- End H6N patch -- */
     }
     if(!c || clients.length()>1)
     {
@@ -2877,13 +2873,8 @@ void process(ENetPacket *packet, int sender, int chan)
 
         /* -- Begin H6N patch -- */
         
-        // Generate a shaared secret
-        // This should be a value used only once and is known to both the client and the server, like an
-        // encryption key, nonce, Steam ticket, or other authentication token. It's cryptographically hashed
-        // internally. 
-
-        // This value should normally be cryptographically secure, but an insecure random is good enough for our demo
-        cl->sharedsecret = randomMT();
+        // Acquire shared secret
+        cl->sharedsecret = getint(p);
 
         // Inform H6AC of the new player
         h6acserver->registerPlayer(cl->calculateH6ACPlayerID(), (uint8_t*)&cl->sharedsecret, sizeof(cl->sharedsecret));

@@ -65,3 +65,4 @@ profile/*
 /source/vcpp/Standalone/assaultcube.log
 /source/vcpp/Standalone Debug/assaultcube.tlog
 /source/vcpp/Standalone Debug
+/serverlog*

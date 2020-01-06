@@ -1416,11 +1416,6 @@ void parsemessages(int cn, playerent *d, ucharbuf &p, bool demo = false)
                 player1->clientnum = getint(p);
                 break;
             }
-            /* -- Begin H6N patch -- */
-            case SV_SHAREDSECRET:
-                // todo: (H6N)  save shared secret val
-                break;
-            /* -- End H6N patch -- */
             default:
                 neterr("type");
                 return;

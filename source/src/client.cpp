@@ -2,6 +2,7 @@
 
 #include "cube.h"
 #include "bot/bot.h"
+#include "libh6n/libh6n.h"
 
 VAR(connected, 1, 0, 0);
 
@@ -11,6 +12,10 @@ int connmillis = 0, connattempts = 0, discmillis = 0;
 SVAR(curdemofile, "n/a");
 extern bool clfail, cllock;
 extern int searchlan;
+
+/* -- Begin H6N patch -- */
+H6ACClient* h6acclient = NULL;
+/* -- End H6N patch -- */
 
 int getclientnum() { return player1 ? player1->clientnum : -1; }
 
@@ -76,6 +81,29 @@ void connectserv_(const char *servername, int serverport = 0, const char *passwo
     copystring(clientpassword, password ? password : "");
     ENetAddress address;
     address.port = serverport;
+
+    /* -- Begin H6N patch -- */
+
+    // Create H6AC client interface
+    h6acclient = Agent_createClient();
+    if (H6N_IS_ERROR(h6acclient))
+        conoutf("\f2H6AC client could not be initialized");
+
+
+    // Generate a shaared secret
+    // This should be a value used only once and is known to both the client and the server, like an
+    // encryption key, nonce, Steam ticket, or other authentication token. It's cryptographically hashed
+    // internally. 
+
+    // This value should normally be cryptographically secure, but an insecure random is good enough for our demo
+    player1->sharedsecret = randomMT();
+
+    // Set the player's "unique" ID and shared secret value
+    // Check the server implementation for more details on this value.
+    h6acclient->setPlayerUniqueID(player1->calculateH6ACPlayerID());
+    h6acclient->setSharedSecret((uint8_t*)&player1->sharedsecret, sizeof(player1->sharedsecret));
+
+    /* -- End H6N patch -- */
 
     if(servername)
     {
@@ -582,6 +610,9 @@ void sendintro()
     connectrole = CR_DEFAULT;
     putint(p, player1->nextprimweap->type);
     loopi(2) putint(p, player1->skin(i));
+    /* -- Begin H6N patch -- */
+    putint(p, player1->sharedsecret);
+    /* -- End H6N patch -- */
     sendpackettoserv(1, p.finalize());
 }
 
