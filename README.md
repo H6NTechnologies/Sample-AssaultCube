@@ -1,3 +1,27 @@
+# Sample-AssaultCube
+
+This is a sample project demonstrating a basic H6AC integration in a game.  AssaultCube is an open-source game that we've patched to add H6AC support.
+
+Here's a non-exhaustive list of major changes:
+[server.cpp:4429](https://github.com/H6NTechnologies/Sample-AssaultCube/blob/master/source/src/server.cpp#L4429)
+[client.cpp:88](https://github.com/H6NTechnologies/Sample-AssaultCube/blob/master/source/src/client.cpp#L88)
+
+
+Nearly all patches have been marked with:
+```
+    /* -- Begin H6N patch -- */
+    ...
+    /* -- End H6N patch -- */
+```
+
+Note that you'll need H6AC binaries (H6Agent.dll, etc) to actually run the demo, which we have not provided.
+
+Everything below this line is the original AssaultCube readme.
+
+
+------------
+
+
 ## What is AssaultCube?
 AssaultCube is a **FREE**, multiplayer, first-person shooter game, based on the
 [CUBE engine](http://cubeengine.com/cube.php4).
