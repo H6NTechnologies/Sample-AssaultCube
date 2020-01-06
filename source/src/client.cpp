@@ -378,6 +378,9 @@ void cleanupclient()
         enet_host_destroy(clienthost);
         clienthost = NULL;
     }
+    /* -- Begin H6N patch -- */
+    h6acclient->disconnect();
+    /* -- End H6N patch -- */
 }
 
 // collect c2s messages conveniently
